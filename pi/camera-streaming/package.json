@@ -1,0 +1,18 @@
+{
+  "name": "webrtc-browser-stream-server",
+  "version": "1.0.0",
+  "description": "Raspberry Pi WebRTC browser streaming server with Firebase signaling",
+  "main": "webrtc-browser-stream-server.js",
+  "scripts": {
+    "start": "node webrtc-browser-stream-server.js",
+    "dev": "node webrtc-browser-stream-server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^13.6.0",
+    "wrtc": "^0.4.7"
+  }
+}

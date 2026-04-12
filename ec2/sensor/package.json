@@ -1,0 +1,30 @@
+{
+  "name": "ec2-sensor-control",
+  "version": "1.0.0",
+  "description": "EC2 sensor control API server",
+  "main": "sensor-control-ec2-server.js",
+  "scripts": {
+    "start": "node sensor-control-ec2-server.js",
+    "dev": "nodemon sensor-control-ec2-server.js"
+  },
+  "keywords": [
+    "ec2",
+    "express",
+    "iot",
+    "sensor",
+    "postgres"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
