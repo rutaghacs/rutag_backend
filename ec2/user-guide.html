@@ -167,7 +167,7 @@
     <div class="toc">
       <h3>&#x1F4CB; Quick Navigation</h3>
       <ol>
-        <li><a href="#getting-started">Getting Started &mdash; Sign In &amp; First Launch</a></li>
+        <li><a href="#getting-started">Getting Started &mdash; Sign In, Sign Up &amp; First Launch</a></li>
         <li><a href="#dashboard">Dashboard Overview</a></li>
         <li><a href="#devices">Managing Devices</a></li>
         <li><a href="#sensors">Sensor Control</a></li>
@@ -186,18 +186,29 @@
         <div class="section-icon">&#x1F680;</div>
         <h2>Getting Started</h2>
       </div>
-      <p class="intro">Follow these steps the first time you open the app.</p>
+      <p class="intro">Follow these steps the first time you open the app, whether you are signing in with Google or creating a non-Gmail email/password account.</p>
       <div class="subsection">
         <div class="subsection-title">Signing In</div>
         <ul class="steps">
           <li><div class="step-num">1</div><div class="step-body"><strong>Open the App</strong><p>Launch Precision IoT on your mobile device. The login screen appears with two sign-in options.</p></div></li>
           <li><div class="step-num">2</div><div class="step-body"><strong>Sign In with Google (recommended)</strong><p>Tap <strong>Sign in with Google</strong>. Choose your Google account from the picker. Your name and photo load automatically.</p></div></li>
-          <li><div class="step-num">3</div><div class="step-body"><strong>&#8212; or &#8212; Sign In with Email &amp; Password</strong><p>Tap <strong>Sign in with Email</strong>, enter your registered email and password, then tap <strong>Sign In</strong>. Contact your administrator if you need an account.</p></div></li>
+          <li><div class="step-num">3</div><div class="step-body"><strong>&#8212; or &#8212; Sign In with Email &amp; Password</strong><p>Tap <strong>Sign in with Email</strong>, enter your registered email and password, then tap <strong>Sign In</strong>. This path is for accounts that have already been created and approved by an administrator.</p></div></li>
           <li><div class="step-num">4</div><div class="step-body"><strong>Automatic Redirect to Dashboard</strong><p>On success you are taken straight to the Dashboard. Your profile is synced in the background.</p></div></li>
         </ul>
       </div>
-      <div class="callout info"><strong>&#x2139;&#xFE0F; New user?</strong>Your first Google Sign-In automatically creates an account &mdash; no extra registration needed.</div>
-      <div class="callout warning"><strong>&#x26A0;&#xFE0F; Blocked account</strong>If your account has been suspended you will see an Access Denied screen instead of the Dashboard. Contact your administrator to appeal.</div>
+      <div class="subsection">
+        <div class="subsection-title">Creating a New Email/Password Account</div>
+        <ul class="steps">
+          <li><div class="step-num">1</div><div class="step-body"><strong>Open the Sign-Up Popup</strong><p>On the login screen, tap <strong>Sign in with Email</strong>, then choose the <strong>Sign Up</strong> option in the popup.</p></div></li>
+          <li><div class="step-num">2</div><div class="step-body"><strong>Enter Required Details</strong><p>Provide a <strong>non-Gmail email address</strong>, your display name, and a password with at least 6 characters. Gmail addresses should use the Google sign-in path instead.</p></div></li>
+          <li><div class="step-num">3</div><div class="step-body"><strong>Submit and Wait for Confirmation</strong><p>Tap <strong>Submit</strong>. The app creates your account and sends the new credentials to the backend. A success message appears only after the backend acknowledges receipt.</p></div></li>
+          <li><div class="step-num">4</div><div class="step-body"><strong>Read the Success Message</strong><p>When registration completes, the app shows <strong>New user created successfully, wait for admin approval.</strong> At this stage the account exists, but app access is still blocked.</p></div></li>
+          <li><div class="step-num">5</div><div class="step-body"><strong>Wait for Administrator Approval</strong><p>An administrator must unblock your account in the admin portal before your first email/password login will succeed.</p></div></li>
+          <li><div class="step-num">6</div><div class="step-body"><strong>Sign In After Approval</strong><p>Once approved, return to <strong>Sign in with Email</strong> and log in with the same email and password to reach the Dashboard.</p></div></li>
+        </ul>
+      </div>
+      <div class="callout info"><strong>&#x2139;&#xFE0F; New user?</strong>Your first Google Sign-In automatically creates an active account. If you want an email/password account, use the non-Gmail sign-up flow above.</div>
+      <div class="callout warning"><strong>&#x26A0;&#xFE0F; Pending approval or blocked account</strong>If your account is waiting for administrator approval, or an administrator has blocked it later, the Dashboard will remain inaccessible until the account is unblocked.</div>
     </div>
 
     <!-- 2. DASHBOARD OVERVIEW -->
@@ -435,16 +446,17 @@
         <div class="section-icon">&#x1F6AB;</div>
         <h2>Blocked Account Access</h2>
       </div>
-      <p class="intro">If your account has been suspended, the app shows an <strong>Access Denied</strong> screen in place of the Dashboard.</p>
+      <p class="intro">If your account is pending administrator approval or has been blocked, the app prevents Dashboard access until an administrator restores access.</p>
       <table>
         <thead><tr><th>What you see</th><th>What it means</th></tr></thead>
         <tbody>
-          <tr><td>Access Denied screen</td><td>A system administrator has blocked your account</td></tr>
-          <tr><td>Block reason text</td><td>The reason provided by the administrator</td></tr>
+          <tr><td>Account pending activation</td><td>Your email/password account was created successfully and is still waiting for administrator approval</td></tr>
+          <tr><td>Access Denied screen</td><td>A system administrator has blocked an account that was previously active</td></tr>
+          <tr><td>Block reason text</td><td>The reason provided by the administrator, if one was supplied</td></tr>
           <tr><td>Sign Out button</td><td>Only available action &mdash; clears your local session</td></tr>
         </tbody>
       </table>
-      <div class="callout danger"><strong>&#x1F6AB; Cannot access app while blocked</strong>You cannot view devices, sensors, or alerts until an administrator lifts the block. Contact your system administrator to appeal.</div>
+      <div class="callout danger"><strong>&#x1F6AB; Cannot access app while approval is pending or while blocked</strong>You cannot view devices, sensors, or alerts until an administrator approves or restores your access. Contact your system administrator if approval is delayed.</div>
     </div>
 
     <!-- 10. TROUBLESHOOTING -->
