@@ -17,7 +17,6 @@ const EC2_HOST = process.env.EC2_HOST || '13.205.201.82';
 
 const ALERT_API_URL =
   process.env.ALERT_API_URL ||
-  process.env.RAILWAY_API_URL ||
   `http://${EC2_HOST}/alert-api/api/alerts`;
 
 const ADMIN_PORTAL_URL = process.env.ADMIN_PORTAL_URL || `http://${EC2_HOST}`;
