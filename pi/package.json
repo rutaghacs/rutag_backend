@@ -8,7 +8,7 @@
         "start": "node camera_server.js",
         "camera": "node camera_server.js",
         "device:register": "node device_registration.js",
-        "sensor:register": "node sensor_registration.js",
+        "sensor:register": "node sensor_control.js",
         "alert:single": "node rpi_send_single_alert_with_image.js",
         "alert:test": "node \"send_test_alert.js\""
     },

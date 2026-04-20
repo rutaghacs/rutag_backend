@@ -18,6 +18,10 @@ const EC2_HOST = process.env.EC2_HOST || '13.205.201.82';
 const ALERT_API_URL =
   process.env.ALERT_API_URL ||
   `http://${EC2_HOST}/alert-api/api/alerts`;
+const ALERT_IMAGE_UPLOAD_URL =
+  process.env.ALERT_IMAGE_UPLOAD_URL ||
+  ALERT_API_URL.replace(/\/api\/alerts$/, '/api/uploads/alert-image');
+const TEST_IMAGE_PATH = path.resolve(process.env.TEST_IMAGE_PATH || path.join(__dirname, 'test.jpg'));
 
 const ADMIN_PORTAL_URL = process.env.ADMIN_PORTAL_URL || `http://${EC2_HOST}`;
 const API_KEY = process.env.API_KEY || process.env.ADMIN_API_KEY || '';
@@ -110,6 +114,34 @@ function sendRequest(url, data, method = 'POST', extraHeaders = {}) {
   });
 }
 
+async function uploadImageToStorage(deviceId) {
+  if (!fs.existsSync(TEST_IMAGE_PATH)) {
+    console.warn(`⚠️  Test image not found at ${TEST_IMAGE_PATH}; sending alerts without screenshot.`);
+    return null;
+  }
+
+  const fileName = `test_${Date.now()}.jpg`;
+  const imageBase64 = fs.readFileSync(TEST_IMAGE_PATH).toString('base64');
+  const response = await sendRequest(
+    ALERT_IMAGE_UPLOAD_URL,
+    {
+      deviceId,
+      fileName,
+      contentType: 'image/jpeg',
+      imageBase64,
+    },
+    'POST'
+  );
+
+  if (!response || response.status < 200 || response.status >= 300 || !response.data?.imageUrl) {
+    console.warn(`⚠️  Image upload failed, continuing without screenshot: ${JSON.stringify(response?.data || response)}`);
+    return null;
+  }
+
+  console.log(`🖼️  Uploaded test image: ${response.data.imageUrl}`);
+  return response.data.imageUrl;
+}
+
 /**
  * Check whether the device is allowed to send alerts via Admin Portal.
  */
@@ -148,7 +180,7 @@ async function checkDeviceStatus(deviceId) {
 /**
  * Send an alert to the Alert API
  */
-async function sendAlert(deviceId, riskLevel = "Medium", description = "Test alert from Raspberry Pi") {
+async function sendAlert(deviceId, riskLevel = "Medium", description = "Test alert from Raspberry Pi", imageUrl = null) {
   const alertPayload = {
     deviceId: deviceId,
     alert: {
@@ -157,7 +189,7 @@ async function sendAlert(deviceId, riskLevel = "Medium", description = "Test ale
       risk_label: riskLevel,
       predicted_risk: riskLevel,
       description: [description, `Sent from ${DEVICE_NAME}`],
-      screenshot: [],
+      screenshot: imageUrl ? [imageUrl] : [],
       device_identifier: DEVICE_NAME,
       timestamp: Date.now(),
       model_version: "v1.0",
@@ -165,7 +197,8 @@ async function sendAlert(deviceId, riskLevel = "Medium", description = "Test ale
       additional_data: {
         test: true,
         source: "raspberry_pi",
-        sent_at: new Date().toISOString()
+        sent_at: new Date().toISOString(),
+        ...(imageUrl ? { image_url: imageUrl } : {})
       }
     }
   };
@@ -266,6 +299,8 @@ async function main() {
     process.exit(1);
   }
 
+  const uploadedImageUrl = await uploadImageToStorage(deviceId);
+
   console.log("\n📤 Sending test alerts...");
   console.log("-".repeat(60));
 
@@ -278,7 +313,7 @@ async function main() {
   ];
 
   for (const [riskLevel, description] of alerts) {
-    await sendAlert(deviceId, riskLevel, description);
+    await sendAlert(deviceId, riskLevel, description, uploadedImageUrl);
     console.log();
     
     // Wait 2 seconds between alerts
