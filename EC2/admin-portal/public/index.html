@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Admin Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #657786;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #657786;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        #usersTableBody tr.user-row td {
+            border-bottom: 3px solid #d8e0ea;
+            transition: background-color 0.2s ease;
+        }
+
+        #usersTableBody tr.user-row-a td {
+            background: #f7fbff;
+        }
+
+        #usersTableBody tr.user-row-b td {
+            background: #f2f7fc;
+        }
+
+        #usersTableBody tr.user-row:hover td {
+            background: #eaf2fb;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-toggle.disabled {
+            background: #ef4444;
+        }
+
+        .btn-toggle:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-block {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-unblock {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-block:hover, .btn-unblock:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-reset {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-edit {
+            background: #2563eb;
+            color: white;
+        }
+
+        .icon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+        }
+
+        .icon-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            pointer-events: none;
+        }
+
+        .icon-btn[data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%) translateY(4px);
+            padding: 6px 8px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.94);
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            z-index: 10;
+        }
+
+        .icon-btn[data-tooltip]::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 2px);
+            transform: translateX(-50%) translateY(4px);
+            border-width: 6px 6px 0 6px;
+            border-style: solid;
+            border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            z-index: 10;
+        }
+
+        .icon-btn:hover::after,
+        .icon-btn:hover::before,
+        .icon-btn:focus-visible::after,
+        .icon-btn:focus-visible::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .icon-btn:focus-visible {
+            outline: 2px solid #bfdbfe;
+            outline-offset: 2px;
+        }
+
+        .btn-delete {
+            background: #b91c1c;
+            color: white;
+        }
+
+        .btn-edit:hover, .btn-delete:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-blocked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-unblocked {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #657786;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #657786;
+        }
+
+        .empty-state svg {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* LOGIN SCREEN */
+        #loginScreen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loginScreen.visible {
+            display: flex;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .login-card p {
+            color: #657786;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .login-field {
+            margin-bottom: 16px;
+        }
+
+        .login-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .login-field input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .login-field input:focus {
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .login-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            float: right;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .header-actions {
+            float: right;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sync-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .sync-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sync-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .guide-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .guide-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sync-status {
+            font-size: 12px;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <h2>🔧 Admin Portal</h2>
+            <p>Sign in to manage devices and users</p>
+            <div class="login-error" id="loginError">Invalid username or password</div>
+            <div class="login-field">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" />
+            </div>
+            <div class="login-field">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+            </div>
+            <button class="login-btn" onclick="doLogin()">Sign In</button>
+        </div>
+    </div>
+
+    <div id="mainApp" style="display:none">
+    <div class="header">
+        <h1 style="display:inline">🔧 Sensor Admin Portal</h1>
+        <div class="header-actions">
+            <span id="syncStatus" class="sync-status"></span>
+            <button class="guide-btn" onclick="openUserGuide()">User Guide</button>
+            <button class="sync-btn" id="syncBtn" onclick="manualSync()">Sync Data</button>
+            <button class="logout-btn" onclick="doLogout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab" onclick="switchTab('devices')">Devices</button>
+            <button class="tab" onclick="switchTab('users')">Users</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Devices</h3>
+                    <div class="value" id="totalDevices">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Devices</h3>
+                    <div class="value" id="activeDevices">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="value" id="totalUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Blocked Users</h3>
+                    <div class="value" id="blockedUsers">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEVICES TAB -->
+        <div id="devices" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Device Name</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Last Seen</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesTableBody">
+                        <tr><td colspan="6" class="loading">Loading devices...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- USERS TAB -->
+        <div id="users" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Email</th>
+                            <th>Display Name</th>
+                            <th>Auth Type</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="7" class="loading">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <!-- end mainApp -->
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+
+        // ---- AUTH ----
+        async function checkAuth() {
+            const res = await fetch(`${API_BASE}/auth/status`);
+            const data = await res.json();
+            if (data.authenticated) {
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.add('visible');
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.remove('visible');
+            document.getElementById('mainApp').style.display = 'block';
+            loadDashboard();
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                if (res.ok) {
+                    showApp();
+                } else {
+                    errorEl.style.display = 'block';
+                }
+            } catch (e) {
+                errorEl.textContent = 'Connection error. Try again.';
+                errorEl.style.display = 'block';
+            }
+        }
+
+        async function doLogout() {
+            await fetch(`${API_BASE}/logout`, { method: 'POST' });
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('syncStatus').textContent = '';
+            showLogin();
+        }
+
+        function openUserGuide() {
+            window.open('/admin-portal-user-guide', '_blank');
+        }
+
+        async function manualSync() {
+            const syncBtn = document.getElementById('syncBtn');
+            const syncStatus = document.getElementById('syncStatus');
+
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Syncing...';
+            syncStatus.textContent = 'Sync in progress';
+
+            try {
+                const response = await fetch(`${API_BASE}/sync/refresh`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to sync');
+                }
+
+                const userCount = result?.totals?.users ?? '-';
+                const deviceCount = result?.totals?.devices ?? '-';
+                syncStatus.textContent = `Synced. Users: ${userCount}, Devices: ${deviceCount}`;
+
+                await Promise.all([
+                    loadDashboard(),
+                    loadUsers(true),
+                    loadDevices(true)
+                ]);
+            } catch (error) {
+                console.error('Manual sync failed:', error);
+                syncStatus.textContent = 'Sync failed';
+                alert(`Sync failed: ${error.message || 'Unknown error'}`);
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.textContent = 'Sync Data';
+            }
+        }
+
+        // Allow Enter key on login form
+        document.getElementById('loginPassword').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+        document.getElementById('loginUsername').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // If API returns 401, redirect to login
+        const _origFetch = window.fetch;
+        window.fetch = async function(...args) {
+            const res = await _origFetch(...args);
+            if (res.status === 401 && !args[0].toString().includes('/api/login')) {
+                showLogin();
+            }
+            return res;
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+
+            // Load data for the active tab
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'devices') loadDevices();
+            if (tabName === 'users') loadUsers();
+        }
+
+        // Load Dashboard Stats
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/stats`);
+                const data = await response.json();
+
+                document.getElementById('totalDevices').textContent = data.totalDevices;
+                document.getElementById('activeDevices').textContent = data.activeDevices;
+                document.getElementById('totalUsers').textContent = data.totalUsers;
+                document.getElementById('blockedUsers').textContent = data.blockedUsers;
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        // Load Devices
+        async function loadDevices(silent = false) {
+            const tbody = document.getElementById('devicesTableBody');
+            if (!silent) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading devices...</td></tr>';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/devices`);
+                const devices = await response.json();
+
+                if (devices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No devices found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = devices.map(device => `
+                    <tr>
+                        <td>${device.device_id}</td>
+                        <td>${device.device_name || 'Unnamed Device'}</td>
+                        <td>${device.location || 'N/A'}</td>
+                        <td>
+                            <span class="status-badge ${device.is_active ? 'status-active' : 'status-inactive'}">
+                                ${device.is_active ? 'Active' : 'Restricted'}
+                            </span>
+                        </td>
+                        <td>${device.last_seen ? new Date(device.last_seen).toLocaleString() : 'Never'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-toggle ${device.is_active ? '' : 'disabled'}" 
+                                        onclick="toggleDevice('${device.device_id}')">
+                                    ${device.is_active ? 'Restrict' : 'Allow'}
+                                </button>
+                                <button class="btn btn-delete" onclick="deleteDevice('${device.device_id}')">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load devices:', error);
+                tbody.innerHTML = '<tr><td colspan="6" class="error">Failed to load devices</td></tr>';
+            }
+        }
+
+        // Toggle Device Status
+        async function toggleDevice(deviceId) {
+            try {
+                const response = await fetch(`${API_BASE}/devices/${deviceId}/toggle`, {
+                    method: 'PUT'
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    loadDevices(); // Reload devices
+                    loadDashboard(); // Update dashboard stats
+                } else {
+                    alert('Failed to toggle device: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Failed to toggle device:', error);
+                alert('Failed to toggle device');
+            }
+        }
+
+        // Load Users (with device mappings)
+        async function loadUsers(silent = false) {
+            const tbody = document.getElementById('usersTableBody');
+            if (!silent) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading users...</td></tr>';
+            }
+
+            try {
+                const [usersResponse, mappingsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/users`),
+                    fetch(`${API_BASE}/user-device-mappings`)
+                ]);
+                const users = await usersResponse.json();
+                const mappings = await mappingsResponse.json();
+
+                // Group mappings by user_id
+                const userDeviceMap = {};
+                if (Array.isArray(mappings)) {
+                    mappings.forEach(m => {
+                        if (!userDeviceMap[m.user_id]) userDeviceMap[m.user_id] = [];
+                        userDeviceMap[m.user_id].push(m);
+                    });
+                }
+
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = users.map((user, index) => {
+                    const devices = userDeviceMap[user.user_id] || [];
+                    const deviceBadges = devices.length > 0
+                        ? devices.map(d => `<span class="device-badge ${d.device_active ? '' : 'device-badge-inactive'}" title="ID: ${d.device_id}&#10;Location: ${d.location || 'N/A'}&#10;Paired: ${d.added_at ? new Date(d.added_at).toLocaleDateString() : 'Unknown'}">${d.device_name || d.device_id}</span>`).join(' ')
+                        : '<span class="no-devices-label">No devices paired</span>';
+                    const deviceCount = devices.length;
+                    const deviceCountBadge = `<span class="device-count-badge ${deviceCount >= 3 ? 'device-count-max' : ''}">${deviceCount}/3</span>`;
+
+                    return `
+                    <tr class="user-row ${index % 2 === 0 ? 'user-row-a' : 'user-row-b'}">
+                        <td>${user.user_id}</td>
+                        <td>${user.email}</td>
+                        <td>${user.display_name || 'N/A'}</td>
+                        <td>${user.auth_provider === 'password' ? 'Email/Password' : 'Google'}</td>
+                        <td>
+                            <span class="status-badge ${user.is_blocked ? 'status-blocked' : 'status-unblocked'}">
+                                ${user.is_blocked ? 'Blocked' : 'Active'}
+                            </span>
+                        </td>
+                        <td>${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn ${user.is_blocked ? 'btn-unblock' : 'btn-block'}" 
+                                        onclick="toggleUserBlock('${user.user_id}')">
+                                    ${user.is_blocked ? 'Unblock' : 'Block'}
+                                </button>
+                                ${user.auth_provider === 'password' && !/@(?:gmail|googlemail)\.com$/i.test(user.email || '') ? `
+                                    <button class="btn btn-edit icon-btn" type="button" data-tooltip="Edit display name" title="Edit display name" aria-label="Edit display name" onclick="editUserDisplayName('${user.user_id}', '${(user.display_name || '').replace(/'/g, "\\'")}')">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0L14.84 5.24l3.75 3.75 2.12-1.78z"/></svg>
+                                    </button>
+                                    <button class="btn btn-reset icon-btn" type="button" data-tooltip="Send password reset link" title="Send password reset link" aria-label="Send password reset link" onclick="forgotPassword('${user.user_id}', '${user.email || ''}')">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 5h-7.586l-1.707-1.707A.997.997 0 0 0 12 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V6c0-.553-.447-1-1-1zm-8.293 10.707-2 2a.999.999 0 1 1-1.414-1.414L10.586 16H8a1 1 0 1 1 0-2h2.586l-.293-.293a.999.999 0 1 1 1.414-1.414l2 2a.999.999 0 0 1 0 1.414zM16 12a1 1 0 1 1 0-2h1V8a1 1 0 1 1 2 0v3a1 1 0 0 1-1 1h-2z"/></svg>
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-delete icon-btn" type="button" data-tooltip="Delete user" title="Delete user" aria-label="Delete user" onclick="deleteUser('${user.user_id}', '${user.email}')">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3a1 1 0 0 0-1 1v1H5a1 1 0 1 0 0 2h1v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7h1a1 1 0 1 0 0-2h-3V4a1 1 0 0 0-1-1H9zm1 2h4v1h-4V5zm-1 5a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0v-6zm4 0a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0v-6z"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="device-mapping-row ${index % 2 === 0 ? 'user-row-a' : 'user-row-b'}">
+                        <td colspan="7" class="device-mapping-cell">
+                            <span class="mapping-label"><b>Paired Devices</b> ${deviceCountBadge}</span>
+                            <div class="device-badges-wrap">${deviceBadges}</div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error('Failed to load users:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="error">Failed to load users</td></tr>';
+            }
+        }
+
+        async function editUserDisplayName(userId, existingDisplayName) {
+            const nextDisplayName = prompt('Enter updated display name:', existingDisplayName || '');
+            if (nextDisplayName === null) {
+                return;
+            }
+
+            const trimmed = nextDisplayName.trim();
+            if (!trimmed) {
+                alert('Display name cannot be empty.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}/display-name`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName: trimmed })
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || 'Failed to update display name');
+                    return;
+                }
+
+                loadUsers();
+            } catch (error) {
+                console.error('Failed to edit display name:', error);
+                alert('Failed to update display name');
+            }
+        }
+
+        async function forgotPassword(userId, email) {
+            if (!confirm(`Generate a password reset link for ${email}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}/generate-reset-link`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || 'Failed to generate reset link');
+                    return;
+                }
+
+                const link = result.resetLink || '';
+                if (link) {
+                    try {
+                        await navigator.clipboard.writeText(link);
+                        alert(`Reset link copied to clipboard for ${result.email}.\n\nShare this link with the user.`);
+                    } catch (_) {
+                        prompt(`Copy and share this reset link for ${result.email}:`, link);
+                    }
+                } else {
+                    alert('Reset link was not returned by server.');
+                }
+            } catch (error) {
+                console.error('Failed to generate reset link:', error);
+                alert('Failed to generate reset link');
+            }
+        }
+
+        async function deleteUser(userId, email) {
+            if (!confirm(`Delete user ${email}? This will remove account data from EC2 and Firebase.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || 'Failed to delete user');
+                    return;
+                }
+
+                loadUsers();
+                loadDashboard();
+            } catch (error) {
+                console.error('Failed to delete user:', error);
+                alert('Failed to delete user');
+            }
+        }
+
+        async function deleteDevice(deviceId) {
+            if (!confirm(`Delete device ${deviceId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/devices/${deviceId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || 'Failed to delete device');
+                    return;
+                }
+
+                loadDevices();
+                loadDashboard();
+            } catch (error) {
+                console.error('Failed to delete device:', error);
+                alert('Failed to delete device');
+            }
+        }
+
+        // Toggle User Block Status
+        async function toggleUserBlock(userId) {
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}/toggle-block`, {
+                    method: 'PUT'
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    loadUsers(); // Reload users
+                    loadDashboard(); // Update dashboard stats
+                } else {
+                    alert('Failed to toggle user: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Failed to toggle user:', error);
+                alert('Failed to toggle user');
+            }
+        }
+
+        // Initialize - check if already logged in
+        checkAuth();
+
+        // Auto-refresh visible data every 10 seconds
+        setInterval(() => {
+            const activeTab = document.querySelector('.tab-content.active').id;
+            if (activeTab === 'dashboard') {
+                loadDashboard();
+                return;
+            }
+
+            if (activeTab === 'devices') {
+                loadDevices(true);
+                loadDashboard();
+                return;
+            }
+
+            if (activeTab === 'users') {
+                loadUsers(true);
+                loadDashboard();
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
